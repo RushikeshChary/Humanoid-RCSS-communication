@@ -118,7 +118,7 @@
 
 # if __name__ == "__main__":
 #     server_address = "localhost"
-#     server_port = 12345
+#     server_port = 6000
 
 #     client = Client(server_address, server_port)
 #     signal.signal(signal.SIGINT, sig_exit_handle)
@@ -126,15 +126,18 @@
 
 
 
-
-
 import socket
 
+client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+client.connect(('localhost', 6000))
+client.send("CLIENT connection is done\n".encode())
 
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(('127.0.0.1', 6000))
-client.send("I am CLIENT\n".encode())
-from_server = client.recv(4096)
+print("connected to server")
+
+from_server = client.recv(8192)
+
+print("After receiving message from sever")
+
 client.close()
 print (from_server.decode())
 
