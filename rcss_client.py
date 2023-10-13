@@ -127,18 +127,67 @@
 
 
 import socket
+import sys
+import select
+import errno
+
+def messageLoop():
+    buf = bytearray(8192)
+    in_fd = sys.stdin.fileno()
+    M_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    # Create a socket object and connect it to a server
+    # Replace 'server_address' with the actual server address
+    server_port = 6000
+    server_address = ('localhost', server_port)
+    M_socket.connect(server_address)
+
+    read_fds = [in_fd, M_socket.fileno()]
+
+    while True:
+        read_ready, _, _ = select.select(read_fds, [], [])
+
+        for fd in read_ready:
+            if fd == in_fd:
+                # Read from stdin**********************************************************************(giving out input into client terminal)
+                input_data = sys.stdin.readline()
+                if not input_data:
+                    break
+                # Encoding this input and sending it to server.
+                input_data = input_data.rstrip('\n')
+                M_socket.send(input_data.encode('utf-8'))
+
+                if not M_socket:
+                    if errno != errno.ECONNREFUSED:
+                        sys.stderr.write(f"{_file_}: {sys._getframe().f_lineno}: Error sending to socket: {strerror(errno)}\nmsg = [{input_data}]\n")
+                    M_socket.close()
+                print(input_data)
+
+            elif fd == M_socket.fileno():
+                # Read from the socket
+                data, addr = M_socket.recvfrom(8191)
+                if not data:
+                    if errno != errno.ECONNREFUSED:
+                        sys.stderr.write(f"{_file_}: {sys._getframe().f_lineno}: Error receiving from socket: {strerror(errno)}\n")
+                    M_socket.close()
+                else:
+                    processMsg(data)
+                    #print(data)
+
+
+
 
 client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-client.connect(('localhost', 6000))
-client.send("CLIENT connection is done\n".encode())
+# client.connect(('localhost', 6000))
+# client.send("CLIENT connection is done\n".encode())
 
-print("connected to server")
+MessageLoop()
+# print("connected to server")
+# from_server = client.recv(8192)
 
-from_server = client.recv(8192)
+# print("After receiving message from sever")
 
-print("After receiving message from sever")
-
-client.close()
-print (from_server.decode())
+# client.close()
+# print (from_server.decode())
 
 
