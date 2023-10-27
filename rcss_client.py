@@ -131,20 +131,21 @@ import select
 import errno
 
 def messageLoop(M_socket):
-    buf = bytearray(8192)
+    #buf = bytearray(8192)
+    size = 8192
     #M_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     # Create a socket object and connect it to a server
     # Replace 'server_address' with the actual server address
     server_port = 6000
     server_address = ('localhost', server_port)
-    message = b"(init myTeam)"
+    message = b"(init Chary)"
     M_socket.sendto(message,server_address)
     #This is for debugging purpose
-    t = 1
+    t = 0
     while True:
                 # Read from the socket
-                data,addr = M_socket.recvfrom(8192)
+                data = M_socket.recvfrom(size)
                 #For error in recieving data.
                 if not data:
                     if errno != errno.ECONNREFUSED:
@@ -152,15 +153,34 @@ def messageLoop(M_socket):
                     M_socket.close()
                 else:
                     #processMsg(data)
-                    #data = str(data)
-                    print(str(data))
+                    print(data[0].decode())
                 #input_data = sys.stdin.readline()
                 #message_1 = input_data.encode('utf-8')
                 if t :
                     M_socket.sendto(b"(move 10 10)",server_address)
                     t = t-1
 
+
 client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 messageLoop(client)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
