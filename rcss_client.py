@@ -125,69 +125,42 @@
 #     client.messageLoop()
 
 
-
 import socket
 import sys
 import select
 import errno
 
-def messageLoop():
+def messageLoop(M_socket):
     buf = bytearray(8192)
-    in_fd = sys.stdin.fileno()
-    M_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    #M_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     # Create a socket object and connect it to a server
     # Replace 'server_address' with the actual server address
     server_port = 6000
     server_address = ('localhost', server_port)
-    M_socket.connect(server_address)
-
-    read_fds = [in_fd, M_socket.fileno()]
-
+    message = b"(init myTeam)"
+    M_socket.sendto(message,server_address)
+    #This is for debugging purpose
+    t = 1
     while True:
-        read_ready, _, _ = select.select(read_fds, [], [])
-
-        for fd in read_ready:
-            if fd == in_fd:
-                # Read from stdin**********************************************************************(giving out input into client terminal)
-                input_data = sys.stdin.readline()
-                if not input_data:
-                    break
-                # Encoding this input and sending it to server.
-                input_data = input_data.rstrip('\n')
-                M_socket.send(input_data.encode('utf-8'))
-
-                if not M_socket:
-                    if errno != errno.ECONNREFUSED:
-                        sys.stderr.write(f"{_file_}: {sys._getframe().f_lineno}: Error sending to socket: {strerror(errno)}\nmsg = [{input_data}]\n")
-                    M_socket.close()
-                print(input_data)
-
-            elif fd == M_socket.fileno():
                 # Read from the socket
-                data, addr = M_socket.recvfrom(8191)
+                data,addr = M_socket.recvfrom(8192)
+                #For error in recieving data.
                 if not data:
                     if errno != errno.ECONNREFUSED:
                         sys.stderr.write(f"{_file_}: {sys._getframe().f_lineno}: Error receiving from socket: {strerror(errno)}\n")
                     M_socket.close()
                 else:
-                    processMsg(data)
-                    #print(data)
-
-
-
+                    #processMsg(data)
+                    #data = str(data)
+                    print(str(data))
+                #input_data = sys.stdin.readline()
+                #message_1 = input_data.encode('utf-8')
+                if t :
+                    M_socket.sendto(b"(move 10 10)",server_address)
+                    t = t-1
 
 client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-# client.connect(('localhost', 6000))
-# client.send("CLIENT connection is done\n".encode())
-
-MessageLoop()
-# print("connected to server")
-# from_server = client.recv(8192)
-
-# print("After receiving message from sever")
-
-# client.close()
-# print (from_server.decode())
+messageLoop(client)
 
 
