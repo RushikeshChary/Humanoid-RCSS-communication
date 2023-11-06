@@ -131,6 +131,7 @@ import select
 import threading
 import errno
 
+
 def receive_and_print_thread(M_socket):
     size = 8192
     while True:
@@ -149,8 +150,40 @@ def receive_and_print_thread(M_socket):
 
 def input_thread(M_socket, server_address):
     while True:
-        input_data = input("")
-        M_socket.sendto(input_data.encode('utf-8'), server_address)
+        #input_data = input("")
+        
+        #M_socket.sendto(input_data.encode('utf-8'), server_address)
+
+def move(X,Y) :
+	input_ = "move"
+	input_ = input_ + f"{ X Y}"
+	M_socket.sendto(input_.encode('utf-8'),server_address)
+
+def turn(movement) :
+	input_ = "turn"
+	input_ = input_ + f"{ movement}"
+	M_socket.sendto(input_.encode('utf-8'),server_address)
+
+def dash(power) :
+	input_ = "dash"
+	input_ = input_ + f"{ power}"
+	M_socket.sendto(input_.encode('utf-8'),server_address)
+
+def kick(power, direction) :
+	input_ = "kick"
+	input_ = input_ + f"{ power direction}"
+	M_socket.sendto(input_.encode('utf-8'),server_address)
+
+def catch(direction) :
+	input_ = "catch"
+	input_ = input_ + f"{ direction}"
+	M_socket.sendto(input_.encode('utf-8'),server_address)
+
+def turn_neck(angle) :
+	input_ = "turn_neck"
+	input_ = input_ + f"{ angle}"
+	M_socket.sendto(input_.encode('utf-8'),server_address)
+
 
 def main():
     server_port = 6000
