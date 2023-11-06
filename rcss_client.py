@@ -128,59 +128,44 @@
 import socket
 import sys
 import select
+import threading
 import errno
 
-def messageLoop(M_socket):
-    #buf = bytearray(8192)
+def receive_and_print_thread(M_socket):
     size = 8192
-    #M_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    while True:
+        try:
+            data = M_socket.recvfrom(size)
+            if not data[0]:
+                sys.stderr.write(f"Error receiving data from server\n")
+                break
+            print(data[0].decode('utf-8'))
+        except socket.error as e:
+            if e.errno == errno.ECONNREFUSED:
+                sys.stderr.write("Connection refused by the server\n")
+                break
+            else:
+                raise
 
-    # Create a socket object and connect it to a server
-    # Replace 'server_address' with the actual server address
+def input_thread(M_socket, server_address):
+    while True:
+        input_data = input("")
+        M_socket.sendto(input_data.encode('utf-8'), server_address)
+
+def main():
     server_port = 6000
     server_address = ('localhost', server_port)
-    message = b"(init Chary)"
-    M_socket.sendto(message,server_address)
-    #This is for debugging purpose
-    t = 0
-    while True:
-                # Read from the socket
-                data = M_socket.recvfrom(size)
-                #For error in recieving data.
-                if not data:
-                    if errno != errno.ECONNREFUSED:
-                        sys.stderr.write(f"{_file_}: {sys._getframe().f_lineno}: Error receiving from socket: {strerror(errno)}\n")
-                    M_socket.close()
-                else:
-                    #processMsg(data)
-                    print(data[0].decode())
-                #input_data = sys.stdin.readline()
-                #message_1 = input_data.encode('utf-8')
-                if t :
-                    M_socket.sendto(b"(move 10 10)",server_address)
-                    t = t-1
+    M_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    M_socket.sendto(b"(init Chary)", server_address)
 
+    receive_thread = threading.Thread(target=receive_and_print_thread, args=(M_socket,))
+    input_thread_worker = threading.Thread(target=input_thread, args=(M_socket, server_address))
 
-client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-messageLoop(client)
+    receive_thread.start()
+    input_thread_worker.start()
 
+    receive_thread.join()
+    input_thread_worker.join()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+if __name__ == '__main__':
+    main()
