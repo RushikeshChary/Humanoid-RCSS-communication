@@ -133,6 +133,7 @@ import errno
 server_port = 6000
 server_address = ('localhost', server_port)
 M_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
 def receive_and_print_thread(M_socket):
     size = 8192
     while True:
@@ -162,30 +163,25 @@ def move(X,Y) :
 	input_ = f"(move {X} {Y})"
 	M_socket.sendto(input_.encode('utf-8'),server_address)
 
-# def turn(movement) :
-# 	input_ = "turn"
-# 	input_ = input_ + f"{ movement}"
-# 	M_socket.sendto(input_.encode('utf-8'),server_address)
+def turn(moment) :
+	input_ = f"(turn {moment})"
+	M_socket.sendto(input_.encode('utf-8'),server_address)
 #
-# def dash(power) :
-# 	input_ = "dash"
-# 	input_ = input_ + f"{ power}"
-# 	M_socket.sendto(input_.encode('utf-8'),server_address)
+def dash(power) :
+	input_ = f"(dash {power})"
+	M_socket.sendto(input_.encode('utf-8'),server_address)
 #
-# def kick(power, direction) :
-# 	input_ = "kick"
-# 	input_ = input_ + f"{ power direction}"
-# 	M_socket.sendto(input_.encode('utf-8'),server_address)
+def kick(power, direction) :
+	input_ = f"(kick {power} {direction})"
+	M_socket.sendto(input_.encode('utf-8'),server_address)
 #
-# def catch(direction) :
-# 	input_ = "catch"
-# 	input_ = input_ + f"{ direction}"
-# 	M_socket.sendto(input_.encode('utf-8'),server_address)
+def catch(direction) :
+	input_ = f"(catch {direction})"
+	M_socket.sendto(input_.encode('utf-8'),server_address)
 #
-# def turn_neck(angle) :
-# 	input_ = "turn_neck"
-# 	input_ = input_ + f"{ angle}"
-# 	M_socket.sendto(input_.encode('utf-8'),server_address)
+def turn_neck(angle) :
+	input_ = f"(turn_neck {angle})"
+	M_socket.sendto(input_.encode('utf-8'),server_address)
 
 
 def main():
