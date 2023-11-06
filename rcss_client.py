@@ -156,8 +156,9 @@ def main():
     server_port = 6000
     server_address = ('localhost', server_port)
     M_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    M_socket.sendto(b"(init Chary)", server_address)
-
+    team_name = input("")
+    init_message = f"{team_name}"
+    M_socket.sendto(init_message.encode('utf-8'), server_address)
     receive_thread = threading.Thread(target=receive_and_print_thread, args=(M_socket,))
     input_thread_worker = threading.Thread(target=input_thread, args=(M_socket, server_address))
 
