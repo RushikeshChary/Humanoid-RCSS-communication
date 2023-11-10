@@ -129,6 +129,7 @@ import sys
 import select
 import threading
 import errno
+import time
 
 server_port = 6000
 server_address = ('localhost', server_port)
@@ -149,15 +150,6 @@ def receive_and_print_thread(M_socket):
                 break
             else:
                 raise
-
-def input_thread(M_socket, server_address):
-    t=1
-    while True:
-        #input_data = input("")
-        if t:
-            move(10,10)
-            t=t-1
-        #M_socket.sendto(input_data.encode('utf-8'), server_address)
 
 def move(X,Y) :
 	input_ = f"(move {X} {Y})"
@@ -182,6 +174,26 @@ def catch(direction) :
 def turn_neck(angle) :
 	input_ = f"(turn_neck {angle})"
 	M_socket.sendto(input_.encode('utf-8'),server_address)
+
+def input_thread(M_socket, server_address):
+    t = 100
+    m = 1
+    while True:
+        #input_data = input("")
+        if m:
+            move(-4,0)
+            m=m-1
+        #M_socket.sendto(input_data.encode('utf-8'), server_address)
+        while t:
+            #m=m+1
+            #move(m,0)
+            power = 100
+            dash(power)
+            t = t-1
+            time.sleep(0.1)
+            #power = power-1
+	    #input_ = f"(dash {power})"
+	    #M_socket.sendto(input_.encode('utf-8'),server_address)
 
 
 def main():
