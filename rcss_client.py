@@ -178,19 +178,19 @@ def turn_neck(angle) :
 def input_thread(M_socket, server_address):
     t = 100
     m = 1
+    k = 100
     while True:
         #input_data = input("")
         if m:
             move(-4,0)
             m=m-1
         #M_socket.sendto(input_data.encode('utf-8'), server_address)
-        while t:
-            #m=m+1
-            #move(m,0)
-            power = 100
-            dash(power)
-            t = t-1
-            time.sleep(0.1)
+        dash(100)
+        time.sleep(0.2)
+        k = k-1
+        #if k<100 :
+            #kick(100,0)
+            
             #power = power-1
 	    #input_ = f"(dash {power})"
 	    #M_socket.sendto(input_.encode('utf-8'),server_address)
