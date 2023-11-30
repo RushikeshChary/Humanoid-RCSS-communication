@@ -143,7 +143,8 @@ def receive_and_print_thread(M_socket):
             if not data[0]:
                 sys.stderr.write(f"Error receiving data from server\n")
                 break
-            print(data[0].decode('utf-8'))
+	    else:
+            	print(data[0].decode('utf-8'))
         except socket.error as e:
             if e.errno == errno.ECONNREFUSED:
                 sys.stderr.write("Connection refused by the server\n")
