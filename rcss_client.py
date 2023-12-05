@@ -126,89 +126,99 @@
 
 import socket
 import sys
-import select
 import threading
-import errno
 import time
 
-server_port = 6000
-server_address = ('localhost', server_port)
-M_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+class SoccerPlayer:
+    def __init__(self, server_address, server_port):
+        self.server_address = server_address
+        self.server_port = server_port
+        self.M_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-def receive_and_print_thread(M_socket):
-    size = 8192
-    while True:
-        try:
-            data = M_socket.recvfrom(size)
-            if not data[0]:
-                sys.stderr.write(f"Error receiving data from server\n")
-                break
-	    else:
-            	print(data[0].decode('utf-8'))
-        except socket.error as e:
-            if e.errno == errno.ECONNREFUSED:
-                sys.stderr.write("Connection refused by the server\n")
-                break
-            else:
-                raise
+    def connect(self, team_name):
+        init_message = f"{team_name}"
+        self.M_socket.sendto(init_message.encode('utf-8'), (self.server_address, self.server_port))
 
-def move(X,Y) :
-	input_ = f"(move {X} {Y})"
-	M_socket.sendto(input_.encode('utf-8'),server_address)
+    def receive_and_print_thread(self):
+        size = 8192
+        while True:
+            try:
+                data = self.M_socket.recvfrom(size)
+                if not data[0]:
+                    sys.stderr.write(f"Error receiving data from server\n")
+                    break
+                print(data[0].decode('utf-8'))
+            except socket.error as e:
+                if e.errno == socket.errno.ECONNREFUSED:
+                    sys.stderr.write("Connection refused by the server\n")
+                    break
+                else:
+                    raise
 
-def turn(moment) :
-	input_ = f"(turn {moment})"
-	M_socket.sendto(input_.encode('utf-8'),server_address)
-#
-def dash(power) :
-	input_ = f"(dash {power})"
-	M_socket.sendto(input_.encode('utf-8'),server_address)
-#
-def kick(power, direction) :
-	input_ = f"(kick {power} {direction})"
-	M_socket.sendto(input_.encode('utf-8'),server_address)
-#
-def catch(direction) :
-	input_ = f"(catch {direction})"
-	M_socket.sendto(input_.encode('utf-8'),server_address)
-#
-def turn_neck(angle) :
-	input_ = f"(turn_neck {angle})"
-	M_socket.sendto(input_.encode('utf-8'),server_address)
+    def move(self, X, Y):
+        input_ = f"(move {X} {Y})"
+        self.M_socket.sendto(input_.encode('utf-8'), (self.server_address, self.server_port))
 
-def input_thread(M_socket, server_address):
-    t = 100
-    m = 1
-    k = 100
-    while True:
-        #input_data = input("")
-        if m:
-            move(-4,0)
-            m=m-1
-        #M_socket.sendto(input_data.encode('utf-8'), server_address)
-        dash(100)
-        time.sleep(0.2)
-        k = k-1
-        #if k<100 :
-            #kick(100,0)
-            
-            #power = power-1
-	    #input_ = f"(dash {power})"
-	    #M_socket.sendto(input_.encode('utf-8'),server_address)
+    def turn(self, moment):
+        input_ = f"(turn {moment})"
+        self.M_socket.sendto(input_.encode('utf-8'), (self.server_address, self.server_port))
 
+    def dash(self, power):
+        input_ = f"(dash {power})"
+        self.M_socket.sendto(input_.encode('utf-8'), (self.server_address, self.server_port))
 
-def main():
-    team_name = input("")
-    init_message = f"{team_name}"
-    M_socket.sendto(init_message.encode('utf-8'), server_address)
-    receive_thread = threading.Thread(target=receive_and_print_thread, args=(M_socket,))
-    input_thread_worker = threading.Thread(target=input_thread, args=(M_socket, server_address))
+    def kick(self, power, direction):
+        input_ = f"(kick {power} {direction})"
+        self.M_socket.sendto(input_.encode('utf-8'), (self.server_address, self.server_port))
 
-    receive_thread.start()
-    input_thread_worker.start()
+    def catch(self, direction):
+        input_ = f"(catch {direction})"
+        self.M_socket.sendto(input_.encode('utf-8'), (self.server_address, self.server_port))
 
-    receive_thread.join()
-    input_thread_worker.join()
+    def turn_neck(self, angle):
+        input_ = f"(turn_neck {angle})"
+        self.M_socket.sendto(input_.encode('utf-8'), (self.server_address, self.server_port))
+
+    def input_thread(self):
+        m = 1
+        while True:
+            if m:
+                self.move(-4, 0)
+                m = m - 1
+            self.dash(100)
+            self.kick(100,0)
+            time.sleep(0.2)
+
+    def run(self, team_name):
+        self.connect(team_name)
+        receive_thread = threading.Thread(target=self.receive_and_print_thread)
+        input_thread_worker = threading.Thread(target=self.input_thread)
+
+        receive_thread.start()
+        input_thread_worker.start()
+
+        receive_thread.join()
+        input_thread_worker.join()
 
 if __name__ == '__main__':
-    main()
+    player = SoccerPlayer('localhost', 6000)
+    team_name = input("")
+    player.run(team_name)
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
